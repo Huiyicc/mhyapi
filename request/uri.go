@@ -129,24 +129,24 @@ var (
 		Url:  "https://bbs-api.mihoyo.com/apihub/app/api/signIn",
 		Body: make(map[string]interface{}),
 	}
-	// MIHOYOAPP_API_FORUM_LIST 获取app内某讨论区帖子列表
-	MIHOYOAPP_API_FORUM_LIST = RequestStruct{
+	// MIHOYOAPP_API_POSTS_LIST 获取app内某讨论区帖子列表
+	MIHOYOAPP_API_POSTS_LIST = RequestStruct{
 		Url:   "https://bbs-api.mihoyo.com/post/api/getForumPostList",
 		Query: "forum_id=%s&is_good=false&is_hot=false&page_size=%d&sort_type=1",
 	}
-	// MIHOYOAPP_API_FORUM_LOOK 看帖
-	MIHOYOAPP_API_FORUM_LOOK = RequestStruct{
+	// MIHOYOAPP_API_POSTS_DETAIL 看帖
+	MIHOYOAPP_API_POSTS_DETAIL = RequestStruct{
 		Url:   "https://bbs-api.mihoyo.com/post/api/getPostFull",
 		Query: "post_id=%s",
 	}
-	// MIHOYOAPP_API_FORUM_SHARE 分享帖子
-	MIHOYOAPP_API_FORUM_SHARE = RequestStruct{
+	// MIHOYOAPP_API_POSTS_SHARE 分享帖子
+	MIHOYOAPP_API_POSTS_SHARE = RequestStruct{
 		Url:   "https://bbs-api.mihoyo.com/apihub/api/getShareConf",
 		Query: "entity_id=%s&s&entity_type=1",
 		Sign:  true,
 	}
-	// MIHOYOAPP_API_FORUM_LIKE 点赞帖子
-	MIHOYOAPP_API_FORUM_LIKE = RequestStruct{
+	// MIHOYOAPP_API_POSTS_LIKE 点赞帖子
+	MIHOYOAPP_API_POSTS_LIKE = RequestStruct{
 		Url: "https://bbs-api.mihoyo.com/apihub/sapi/upvotePost",
 		Body: map[string]interface{}{
 			"post_id":   "",

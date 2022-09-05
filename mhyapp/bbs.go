@@ -10,14 +10,13 @@ import (
 
 // GetPostsList 用于获取某分区帖子列表
 func (t *AppCore) GetPostsList(forumID string, pageSize int) ([]AppForumInfo, error) {
-	req := request.MIHOYOAPP_API_FORUM_LIST.Copy()
+	req := request.MIHOYOAPP_API_POSTS_LIST.Copy()
 	req.Query = fmt.Sprintf(req.Query, forumID, pageSize)
-	t.updateHeader()
-	data, err := request.HttpGet(req, t.headers)
+	data, err := request.HttpGet(req, t.getHeaders())
 	if err != nil {
 		return nil, err
 	}
-	var resp getForumListRequest
+	var resp getPostsListRequest
 	if err = json.Unmarshal(data, &resp); err != nil {
 		return nil, err
 	}
@@ -27,15 +26,29 @@ func (t *AppCore) GetPostsList(forumID string, pageSize int) ([]AppForumInfo, er
 	return resp.Data.List, nil
 }
 
+// PostDetail 看帖
+func (t *AppCore) PostDetail(postID string) (*AppForumInfo, error) {
+	req := request.MIHOYOAPP_API_POSTS_DETAIL.Copy()
+	req.Query = fmt.Sprintf(req.Query, postID)
+	data, err := request.HttpGet(req, t.getHeaders())
+	if err != nil {
+		return nil, err
+	}
+	var resp getPostsInfoRequest
+	if err = json.Unmarshal(data, &resp); err != nil {
+		return nil, errors.New(string(data))
+	}
+	return &resp.Data.Post, resp.verify()
+}
+
 // PostVote 点赞帖子
+// TODO: 未完成
 func (t *AppCore) PostVote(postID string, isCancel bool) error {
-	req := request.MIHOYOAPP_API_FORUM_LIKE.Copy()
+	req := request.MIHOYOAPP_API_POSTS_LIKE.Copy()
 	req.Body["post_id"] = postID
 	req.Body["is_cancel"] = isCancel
-	t.updateHeader()
-	header := t.headers.Clone()
+	header := t.getHeaders().Clone()
 	header["DS"] = []string{tools.GetDs(false)}
-	header["cookies"] = []string{t.Cookies.GetStoken()}
 	data, err := request.HttpPost(req, t.headers)
 	if err != nil {
 		return err
@@ -55,7 +68,7 @@ type forumLikeResponse struct {
 	Message string
 }
 
-type getForumListRequest struct {
+type getPostsListRequest struct {
 	Retcode int    `json:"retcode"`
 	Message string `json:"message"`
 	Data    struct {
@@ -66,7 +79,19 @@ type getForumListRequest struct {
 	} `json:"data"`
 }
 
-func (t *getForumListRequest) verify() error {
+type getPostsInfoRequest struct {
+	Retcode int    `json:"retcode"`
+	Message string `json:"message"`
+	Data    struct {
+		Post AppForumInfo `json:"post"`
+	} `json:"data"`
+}
+
+func (t *getPostsInfoRequest) verify() error {
+	return tools.Ifs(t.Retcode == 0, nil, errors.New(t.Message))
+}
+
+func (t *getPostsListRequest) verify() error {
 	return tools.Ifs(t.Retcode == 0, nil, errors.New(t.Message))
 }
 

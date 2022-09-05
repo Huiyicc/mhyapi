@@ -14,6 +14,11 @@ type AppCore struct {
 	headers http.Header
 }
 
+func (t *AppCore) getHeaders() http.Header {
+	t.updateHeader()
+	return t.headers
+}
+
 func (t *AppCore) updateHeader() {
 	if t.headers == nil {
 		t.headers = make(map[string][]string)
