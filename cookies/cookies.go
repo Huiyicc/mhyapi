@@ -18,8 +18,12 @@ func NewCookiesCore(cookies string) (*CookiesCore, error) {
 
 func (t *CookiesCore) Parse(cookies string) error {
 	t.KeysMap = make(map[string]string)
-	list := strings.Split(cookies, "; ")
+	list := strings.Split(cookies, ";")
 	for _, v := range list {
+		if v == "" {
+			continue
+		}
+		v = strings.TrimSpace(v)
 		index := strings.Index(v, "=")
 		key := v[:index]
 		value := v[index+1:]
@@ -35,13 +39,16 @@ func (t *CookiesCore) Parse(cookies string) error {
 func (t *CookiesCore) GetStr() string {
 	var r string
 	for k, v := range t.KeysMap {
+		if k == "" || v == "" {
+			continue
+		}
 		r += k + "=" + v + "; "
 	}
 	return r
 }
 
 func (t *CookiesCore) GetStoken() string {
-	return fmt.Sprintf("stoken=%s; stuid=%s;", t.KeysMap["stoken"], t.KeysMap["stoken"])
+	return fmt.Sprintf("stuid=%s;stoken=%s", t.KeysMap["stuid"], t.KeysMap["stoken"])
 }
 
 func (t *CookiesCore) Set(key, value string) {

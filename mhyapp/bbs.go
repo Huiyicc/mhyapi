@@ -3,10 +3,61 @@ package mhyapp
 import (
 	"errors"
 	"fmt"
+	"github.com/Huiyicc/mhyapi/define"
 	"github.com/Huiyicc/mhyapi/request"
 	"github.com/Huiyicc/mhyapi/tools"
 	json "github.com/json-iterator/go"
 )
+
+// GetTasksIDList 获取已完成的米游币任务ID列表
+func (t *AppCore) GetTasksIDList() ([]int, error) {
+	req := request.MIHOYOAPP_API_TASKS_LIST.Copy()
+	req.Query = fmt.Sprintf(req.Query, "myb")
+	data, err := request.HttpGet(req, t.getHeaders())
+	if err != nil {
+		return nil, err
+	}
+	var resp tasksListResponse
+	if err = json.Unmarshal(data, &resp); err != nil {
+		return nil, errors.New(string(data))
+	}
+	if err = resp.verify(); err != nil {
+		return nil, err
+	}
+	rl := make([]int, 0, len(resp.Data.States))
+	for _, state := range resp.Data.States {
+		rl = append(rl, state.MissionId)
+	}
+	return rl, nil
+}
+
+// GetTasksIncompleteIDList 获取未完成的米游币任务ID列表(每日)
+func (t *AppCore) GetTasksIncompleteIDList() ([]int, error) {
+	l, err := t.GetTasksIDList()
+	if err != nil {
+		return nil, err
+	}
+	var unfinishedTaskListMap = map[int]int{
+		define.TASKS_MISSION_ID_BBS_SIGN:       0,
+		define.TASKS_MISSION_ID_BBS_READ_POSTS: 0,
+		define.TASKS_MISSION_ID_BBS_LIKE_POSTS: 0,
+		define.TASKS_MISSION_ID_BBS_SHARE:      0,
+	}
+	rl := make([]int, 0, 4)
+	for _, mv1 := range l {
+		unfinishedTaskListMap[mv1]++
+	}
+	cr := []int{define.TASKS_MISSION_ID_BBS_SIGN,
+		define.TASKS_MISSION_ID_BBS_READ_POSTS,
+		define.TASKS_MISSION_ID_BBS_LIKE_POSTS,
+		define.TASKS_MISSION_ID_BBS_SHARE}
+	for _, val := range cr {
+		if unfinishedTaskListMap[val] == 0 {
+			rl = append(rl, val)
+		}
+	}
+	return rl, nil
+}
 
 // GetPostsList 用于获取某分区帖子列表
 func (t *AppCore) GetPostsList(forumID string, pageSize int) ([]AppForumInfo, error) {
@@ -42,14 +93,14 @@ func (t *AppCore) PostDetail(postID string) (*AppForumInfo, error) {
 }
 
 // PostVote 点赞帖子
-// TODO: 未完成
 func (t *AppCore) PostVote(postID string, isCancel bool) error {
 	req := request.MIHOYOAPP_API_POSTS_LIKE.Copy()
 	req.Body["post_id"] = postID
 	req.Body["is_cancel"] = isCancel
 	header := t.getHeaders().Clone()
+	header["cookie"] = []string{t.Cookies.GetStoken()}
 	header["DS"] = []string{tools.GetDs(false)}
-	data, err := request.HttpPost(req, t.headers)
+	data, err := request.HttpPost(req, header)
 	if err != nil {
 		return err
 	}
@@ -61,6 +112,45 @@ func (t *AppCore) PostVote(postID string, isCancel bool) error {
 		return errors.New(resp.Message)
 	}
 	return nil
+}
+
+// PostShare 用于分享帖子
+func (t *AppCore) PostShare(postID string) (PostShareInfo, error) {
+	req := request.MIHOYOAPP_API_POSTS_SHARE.Copy()
+	req.Query = fmt.Sprintf(req.Query, postID)
+	data, err := request.HttpGet(req, t.getHeaders())
+	if err != nil {
+		return PostShareInfo{}, err
+	}
+	var resp bbsShareResponse
+	if err = json.Unmarshal(data, &resp); err != nil {
+		return PostShareInfo{}, errors.New(string(data))
+	}
+	if resp.Retcode != 0 {
+		return PostShareInfo{}, errors.New(resp.Message)
+	}
+	return resp.Data, nil
+}
+
+// BBSSign 用于板块签到
+// 成功返回本次获得的米游币
+func (t *AppCore) BBSSign(forumID string) (int, error) {
+	req := request.MIHOYOAPP_API_SIGN.Copy()
+	req.Body["gids"] = forumID
+	header := t.getHeaders().Clone()
+	header["DS"] = []string{tools.GetDs2("", req.Body.Get())}
+	data, err := request.HttpPost(req, header)
+	if err != nil {
+		return 0, err
+	}
+	var resp bbsSignResponse
+	if err = json.Unmarshal(data, &resp); err != nil {
+		return 0, errors.New(string(data))
+	}
+	if resp.Retcode != 0 {
+		return 0, errors.New(resp.Message)
+	}
+	return resp.Data.Points, nil
 }
 
 type forumLikeResponse struct {
@@ -92,6 +182,15 @@ func (t *getPostsInfoRequest) verify() error {
 }
 
 func (t *getPostsListRequest) verify() error {
+	return tools.Ifs(t.Retcode == 0, nil, errors.New(t.Message))
+}
+func (t *tasksListResponse) verify() error {
+	return tools.Ifs(t.Retcode == 0, nil, errors.New(t.Message))
+}
+func (t *bbsSignResponse) verify() error {
+	return tools.Ifs(t.Retcode == 0, nil, errors.New(t.Message))
+}
+func (t *bbsShareResponse) verify() error {
 	return tools.Ifs(t.Retcode == 0, nil, errors.New(t.Message))
 }
 
@@ -240,4 +339,41 @@ type AppForumInfo struct {
 	IsBlockOn     bool          `json:"is_block_on"`
 	ForumRankInfo interface{}   `json:"forum_rank_info"`
 	LinkCardList  []interface{} `json:"link_card_list"`
+}
+
+type tasksListResponse struct {
+	Retcode int    `json:"retcode"`
+	Message string `json:"message"`
+	Data    struct {
+		States []struct {
+			MissionId     int    `json:"mission_id"`
+			Process       int    `json:"process"`
+			HappenedTimes int    `json:"happened_times"`
+			IsGetAward    bool   `json:"is_get_award"`
+			MissionKey    string `json:"mission_key"`
+		} `json:"states"`
+		AlreadyReceivedPoints int  `json:"already_received_points"`
+		TotalPoints           int  `json:"total_points"`
+		TodayTotalPoints      int  `json:"today_total_points"`
+		IsUnclaimed           bool `json:"is_unclaimed"`
+		CanGetPoints          int  `json:"can_get_points"`
+	} `json:"data"`
+}
+type bbsSignResponse struct {
+	Retcode int    `json:"retcode"`
+	Message string `json:"message"`
+	Data    struct {
+		Points int `json:"points"`
+	} `json:"data"`
+}
+type bbsShareResponse struct {
+	Retcode int           `json:"retcode"`
+	Message string        `json:"message"`
+	Data    PostShareInfo `json:"data"`
+}
+type PostShareInfo struct {
+	Title   string `json:"title"`
+	Content string `json:"content"`
+	Icon    string `json:"icon"`
+	Url     string `json:"url"`
 }

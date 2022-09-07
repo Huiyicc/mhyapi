@@ -119,9 +119,8 @@ var (
 	}
 	// MIHOYOAPP_API_TASKS_LIST app任务列表
 	MIHOYOAPP_API_TASKS_LIST = RequestStruct{
-		Url: "https://bbs-api.mihoyo.com/apihub/sapi/getUserMissionsState",
-		//Url:   "https://api-takumi.mihoyo.com/apihub/wapi/getUserMissionsState",
-		Query: "point_sn=myb",
+		Url:   "https://bbs-api.mihoyo.com/apihub/sapi/getUserMissionsState",
+		Query: "point_sn=%s",
 		Sign:  true,
 	}
 	// MIHOYOAPP_API_SIGN app内讨论区签到
