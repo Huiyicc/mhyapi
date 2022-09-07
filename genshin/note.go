@@ -3,11 +3,9 @@ package genshin
 import (
 	"errors"
 	"fmt"
-	"github.com/Huiyicc/mhyapi/define"
 	"github.com/Huiyicc/mhyapi/request"
 	"github.com/Huiyicc/mhyapi/tools"
 	json "github.com/json-iterator/go"
-	"math/rand"
 	"strconv"
 	"time"
 )
@@ -16,20 +14,7 @@ import (
 func (t *GenShinCore) GetNoteInfo() (*NoteInfo, error) {
 	req := request.MYSINFO_API_DAILYNOTE.Copy()
 	req.Query = fmt.Sprintf(req.Query, t.GameInfo.GameUid, t.GameInfo.Region)
-	headers := t.getHeaders().Clone()
-	headers["Accept"] = []string{"*/*"}
-	headers["DS"] = []string{tools.GetDs2(req.Query, "")}
-	headers["x-rpc-client_type"] = []string{define.APPCLIENT_TYPE_ANDROID}
-	headers["x-rpc-app_version"] = []string{define.APPCLIENT_VERSIONS}
-	headers["x-rpc-sys_version"] = []string{"6.0.1"}
-	headers["x-rpc-channel"] = []string{"miyousheluodi"}
-	headers["x-rpc-device_id"] = []string{tools.GetDevicesID()}
-	headers["x-rpc-device_name"] = []string{tools.RandString(rand.Intn(5) + 5)}
-	headers["x-rpc-device_model"] = []string{"Mi 10"}
-	headers["Referer"] = []string{"https://app.mihoyo.com"}
-	headers["User-Agent"] = []string{"okhttp/4.8.0"}
-	headers["cookie"] = []string{t.Cookies.GetStr()}
-	headers["Content-Type"] = []string{"application/json"}
+	headers := t.getGameHeaders(req.Query, "")
 	data, err := request.HttpGet(req, headers)
 	if err != nil {
 		return nil, err
@@ -181,7 +166,7 @@ func (t *NoteInfo) parse(r mysNoteResponse) *NoteInfo {
 	return t
 }
 
-//验证器
+// 验证器
 func (t *mysNoteResponse) verify() error {
 	return tools.Ifs(t.Retcode == 0, nil, errors.New(t.Message))
 }

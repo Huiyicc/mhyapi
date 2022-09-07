@@ -39,7 +39,6 @@ var (
 		Url:   "https://api-takumi-record.mihoyo.com/game_record/app/genshin/api/index",
 		Query: "role_id=%s&server=%s",
 	}
-
 	//MYSINFO_API_SPIRALABYSS 深渊
 	MYSINFO_API_SPIRALABYSS = RequestStruct{
 		Url:   "https://api-takumi-record.mihoyo.com/game_record/app/genshin/api/spiralAbyss",

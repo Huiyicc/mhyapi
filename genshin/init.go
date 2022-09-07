@@ -56,3 +56,21 @@ func (t *GenShinCore) updateHeader() {
 	t.headers["Cookie"] = []string{t.Cookies.GetStr()}
 	t.headers["Referer"] = []string{"https://webstatic.mihoyo.com/bbs/event/signin-ys/index.html?bbs_auth_required=true&act_id=" + define.ACTID_GENSHIN + "&utm_source=bbs&utm_medium=mys&utm_campaign=icon"}
 }
+
+func (t *GenShinCore) getGameHeaders(q, b string) http.Header {
+	headers := t.getHeaders().Clone()
+	headers["Accept"] = []string{"*/*"}
+	headers["DS"] = []string{tools.GetDs2(q, b)}
+	headers["x-rpc-client_type"] = []string{define.APPCLIENT_TYPE_ANDROID}
+	headers["x-rpc-app_version"] = []string{define.APPCLIENT_VERSIONS}
+	headers["x-rpc-sys_version"] = []string{"6.0.1"}
+	headers["x-rpc-channel"] = []string{"miyousheluodi"}
+	headers["x-rpc-device_id"] = []string{tools.GetDevicesID()}
+	headers["x-rpc-device_name"] = []string{tools.RandString(rand.Intn(5) + 5)}
+	headers["x-rpc-device_model"] = []string{"Mi 10"}
+	headers["Referer"] = []string{"https://app.mihoyo.com"}
+	headers["User-Agent"] = []string{"okhttp/4.8.0"}
+	headers["cookie"] = []string{t.Cookies.GetStr()}
+	headers["Content-Type"] = []string{"application/json"}
+	return headers
+}
