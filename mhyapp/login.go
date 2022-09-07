@@ -19,7 +19,6 @@ func (t *AppCore) Login() error {
 		return err
 	}
 	t.Cookies.Set("stuid", t.Cookies.Get("account_id"))
-
 	return nil
 }
 

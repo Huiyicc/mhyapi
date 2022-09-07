@@ -180,7 +180,6 @@ type getPostsInfoRequest struct {
 func (t *getPostsInfoRequest) verify() error {
 	return tools.Ifs(t.Retcode == 0, nil, errors.New(t.Message))
 }
-
 func (t *getPostsListRequest) verify() error {
 	return tools.Ifs(t.Retcode == 0, nil, errors.New(t.Message))
 }

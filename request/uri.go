@@ -58,20 +58,20 @@ var (
 		Url:   "https://api-takumi-record.mihoyo.com/game_record/app/genshin/api/dailyNote",
 		Query: "role_id=%s&server=%s",
 	}
-	// MYSINFO_API_BBSSIGN_INFO 签到信息
-	MYSINFO_API_BBSSIGN_INFO = RequestStruct{
+	// MYSINFO_API_GAMESIGN_INFO 签到信息
+	MYSINFO_API_GAMESIGN_INFO = RequestStruct{
 		Url:   "https://api-takumi.mihoyo.com/event/bbs_sign_reward/info",
-		Query: "act_id=e202009291139501&region=%s&uid=%s",
+		Query: "act_id=%s&region=%s&uid=%s",
 		Sign:  true,
 	}
-	//MYSINFO_API_BBSSIGN_HOME 签到奖励
-	MYSINFO_API_BBSSIGN_HOME = RequestStruct{
+	//MYSINFO_API_GAMESIGN_HOME 签到奖励
+	MYSINFO_API_GAMESIGN_HOME = RequestStruct{
 		Url:   "https://api-takumi.mihoyo.com/event/bbs_sign_reward/home",
-		Query: "act_id=e202009291139501&region=%s&uid=%s",
+		Query: "act_id=%s&region=%s&uid=%s",
 		Sign:  true,
 	}
-	// MYSINFO_API_BBSSIGN 签到
-	MYSINFO_API_BBSSIGN = RequestStruct{
+	// MYSINFO_API_GAMESIGN 签到
+	MYSINFO_API_GAMESIGN = RequestStruct{
 		Url: "https://api-takumi.mihoyo.com/event/bbs_sign_reward/sign",
 		Body: map[string]interface{}{
 			"act_id": "e202009291139501",
@@ -104,6 +104,11 @@ var (
 		Url:   "https://api-takumi.mihoyo.com/binding/api/getUserGameRolesByCookie",
 		Query: "game_biz=%s",
 		Sign:  true,
+	}
+	// MIHOYOAPP_API_COOKIESTOKEN 使用stoken获取cookies_token
+	MIHOYOAPP_API_COOKIESTOKEN = RequestStruct{
+		Url:  "https://passport-api.mihoyo.com/account/auth/api/getCookieAccountInfoBySToken",
+		Sign: true,
 	}
 	// MIHOYOAPP_API_LOGINA app登陆第一阶段
 	MIHOYOAPP_API_LOGINA = RequestStruct{
