@@ -35,13 +35,14 @@ func (t *GenShinCore) GetNoteInfo() (*NoteInfo, error) {
 		return nil, err
 	}
 	var resp mysNoteResponse
-
 	if err = json.Unmarshal(data, &resp); err != nil {
 		return nil, errors.New(string(data))
 	}
 	if err = resp.verify(); err != nil {
 		return nil, err
 	}
+	resp.Data.Region = t.GameInfo.Region
+	resp.Data.GameUID = t.GameInfo.GameUid
 	var r NoteInfo
 	r.parse(resp)
 	return &r, nil
