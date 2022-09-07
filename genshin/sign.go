@@ -27,37 +27,37 @@ func (t *GenShinCore) GetSignRewardsList() ([]RewardInfo, error) {
 	return resp.Data.Awards, nil
 }
 
-// IsSign 用于判断是否已签到
-func (t *GenShinCore) IsSign() (bool, error) {
+// SignInfo 用于获取签到信息
+func (t *GenShinCore) SignInfo() (SignInfo, error) {
 	req := request.MYSINFO_API_GAMESIGN_INFO.Copy()
 	req.Query = fmt.Sprintf(req.Query, define.ACTID_GENSHIN, t.GameInfo.Region, t.GameInfo.GameUid)
 	data, err := request.HttpGet(req, t.getHeaders())
 	if err != nil {
-		return false, err
+		return SignInfo{}, err
 	}
 	var resp isSignResponse
 	if err = json.Unmarshal(data, &resp); err != nil {
-		return false, errors.New(string(data))
+		return SignInfo{}, errors.New(string(data))
 	}
 	if err = resp.verify(); err != nil {
-		return false, err
+		return SignInfo{}, err
 	}
-	return resp.Data.IsSign, err
+	return resp.Data, err
 }
 
 // Sign 签到
-func (t *GenShinCore) Sign() error {
+func (t *GenShinCore) Sign() (SignInfo, error) {
 	var (
-		isSign bool
-		err    error
+		signInfo SignInfo
+		err      error
 	)
 	//先判断是否已经签到
-	if isSign, err = t.IsSign(); err != nil {
-		return err
+	if signInfo, err = t.SignInfo(); err != nil {
+		return SignInfo{}, err
 	}
 	//已经签到就直接签到成功
-	if isSign {
-		return nil
+	if signInfo.IsSign {
+		return signInfo, nil
 	}
 	req := request.MYSINFO_API_GAMESIGN.Copy()
 	req.Body["act_id"] = define.ACTID_GENSHIN
@@ -65,19 +65,19 @@ func (t *GenShinCore) Sign() error {
 	req.Body["uid"] = t.GameInfo.GameUid
 	data, err := request.HttpPost(req, t.getHeaders())
 	if err != nil {
-		return err
+		return signInfo, err
 	}
 	var resp signResponse
 	if err = json.Unmarshal(data, &resp); err != nil {
-		return errors.New(string(data))
+		return signInfo, errors.New(string(data))
 	}
 	if err = resp.verify(); err != nil {
-		return err
+		return signInfo, err
 	}
 	if resp.Data.Success == 1 {
-		return errors.New("触发验证码,请手动签到")
+		return signInfo, errors.New("触发验证码,请手动签到")
 	}
-	return nil
+	return signInfo, nil
 }
 
 type isSignResponse struct {
