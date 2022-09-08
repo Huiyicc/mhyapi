@@ -8,6 +8,8 @@ import (
 	json "github.com/json-iterator/go"
 )
 
+// GetSpiralAbyssInfo 用于获取深渊相关数据
+// scheduleType:1 为本期数据,2为上期数据
 func (t *GenShinCore) GetSpiralAbyssInfo(scheduleType int, gameID, server string) (*SpiralAbyssInfo, error) {
 	req := request.MYSINFO_API_SPIRALABYSS.Copy()
 	req.Query = fmt.Sprintf(req.Query, gameID, scheduleType, server)
@@ -38,7 +40,7 @@ type spiralAbyssInfoResponse struct {
 	Data    SpiralAbyssInfo `json:"data"`
 }
 
-//验证器
+// 验证器
 func (t *spiralAbyssInfoResponse) verify() error {
 	return tools.Ifs(t.Retcode == 0, nil, errors.New(t.Message))
 }

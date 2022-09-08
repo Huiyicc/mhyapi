@@ -34,8 +34,12 @@ func (t *GenShinCore) UpdateBindInfo(index ...int) (*GameInfo, error) {
 	return &t.GameInfo, nil
 }
 
-func (t *GenShinCore) GetBindInfo() *GameInfo {
-	return &t.GameInfo
+// GetBindInfo 用于获取绑定的角色信息
+func (t *GenShinCore) GetBindInfo() (*GameInfo, error) {
+	if t.GameInfo.GameUid == "" {
+		return t.UpdateBindInfo()
+	}
+	return &t.GameInfo, nil
 }
 
 type GameInfo struct {
