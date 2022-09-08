@@ -9,8 +9,8 @@ import (
 	json "github.com/json-iterator/go"
 )
 
-// GetTasksIDList 获取已完成的米游币任务ID列表
-func (t *AppCore) GetTasksIDList() ([]int, error) {
+// GetTasksInfo 获取米游币任务信息相关
+func (t *AppCore) GetTasksInfo() (*TasksInfo, error) {
 	req := request.MIHOYOAPP_API_TASKS_LIST.Copy()
 	req.Query = fmt.Sprintf(req.Query, "myb")
 	data, err := request.HttpGet(req, t.getHeaders())
@@ -24,16 +24,13 @@ func (t *AppCore) GetTasksIDList() ([]int, error) {
 	if err = resp.verify(); err != nil {
 		return nil, err
 	}
-	rl := make([]int, 0, len(resp.Data.States))
-	for _, state := range resp.Data.States {
-		rl = append(rl, state.MissionId)
-	}
-	return rl, nil
+
+	return &resp.Data, nil
 }
 
 // GetTasksIncompleteIDList 获取未完成的米游币任务ID列表(每日)
 func (t *AppCore) GetTasksIncompleteIDList() ([]int, error) {
-	l, err := t.GetTasksIDList()
+	l, err := t.GetTasksInfo()
 	if err != nil {
 		return nil, err
 	}
@@ -44,8 +41,8 @@ func (t *AppCore) GetTasksIncompleteIDList() ([]int, error) {
 		define.TASKS_MISSION_ID_BBS_SHARE:      0,
 	}
 	rl := make([]int, 0, 4)
-	for _, mv1 := range l {
-		unfinishedTaskListMap[mv1]++
+	for _, mv1 := range l.States {
+		unfinishedTaskListMap[mv1.MissionId]++
 	}
 	cr := []int{define.TASKS_MISSION_ID_BBS_SIGN,
 		define.TASKS_MISSION_ID_BBS_READ_POSTS,
@@ -341,23 +338,26 @@ type AppForumInfo struct {
 }
 
 type tasksListResponse struct {
-	Retcode int    `json:"retcode"`
-	Message string `json:"message"`
-	Data    struct {
-		States []struct {
-			MissionId     int    `json:"mission_id"`
-			Process       int    `json:"process"`
-			HappenedTimes int    `json:"happened_times"`
-			IsGetAward    bool   `json:"is_get_award"`
-			MissionKey    string `json:"mission_key"`
-		} `json:"states"`
-		AlreadyReceivedPoints int  `json:"already_received_points"`
-		TotalPoints           int  `json:"total_points"`
-		TodayTotalPoints      int  `json:"today_total_points"`
-		IsUnclaimed           bool `json:"is_unclaimed"`
-		CanGetPoints          int  `json:"can_get_points"`
-	} `json:"data"`
+	Retcode int       `json:"retcode"`
+	Message string    `json:"message"`
+	Data    TasksInfo `json:"data"`
 }
+
+type TasksInfo struct {
+	States []struct {
+		MissionId     int    `json:"mission_id"`
+		Process       int    `json:"process"`
+		HappenedTimes int    `json:"happened_times"`
+		IsGetAward    bool   `json:"is_get_award"`
+		MissionKey    string `json:"mission_key"`
+	} `json:"states"`
+	AlreadyReceivedPoints int  `json:"already_received_points"` //今日已获取米游币数量
+	TotalPoints           int  `json:"total_points"`            //总共拥有米游币
+	TodayTotalPoints      int  `json:"today_total_points"`      //每日可获得最大米游币数量
+	IsUnclaimed           bool `json:"is_unclaimed"`            //未实名
+	CanGetPoints          int  `json:"can_get_points"`          //还可获得
+}
+
 type bbsSignResponse struct {
 	Retcode int    `json:"retcode"`
 	Message string `json:"message"`

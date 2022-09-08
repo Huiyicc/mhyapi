@@ -12,19 +12,19 @@ type CookiesCore struct {
 
 // NewCookiesCore 用于从cookies文本创建一个对象
 func NewCookiesCore(cookies string) (*CookiesCore, error) {
-	r := &CookiesCore{}
-	return r, r.Parse(cookies)
+	r := CookiesCore{}
+	return &r, r.Parse(cookies)
 }
 
 func (t *CookiesCore) Parse(cookies string) error {
 	t.KeysMap = make(map[string]string)
 	list := strings.Split(cookies, ";")
 	for _, v := range list {
-		if v == "" {
-			continue
-		}
 		v = strings.TrimSpace(v)
 		index := strings.Index(v, "=")
+		if index < 0 || v == "" {
+			continue
+		}
 		key := v[:index]
 		value := v[index+1:]
 		t.KeysMap[key] = value
