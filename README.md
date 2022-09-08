@@ -8,7 +8,7 @@
 
 ## 包说明
 
-### cookies 包
+## cookies 包
 
 > 用于存储登陆后的cookies,大部分情况下是内部使用
 
@@ -30,7 +30,7 @@ func main() {
 }
 ```
 
-### define 包
+## define 包
 
 > 定义了全局常量
 
@@ -63,7 +63,7 @@ func main() {
 | GAMERSERVER_GENSHIN_TIANKONGDAO | cn_gf01 | 原神服务器类型:天空岛(官服)  |
 | GAMERSERVER_GENSHIN_SHIJIESHU   | cn_qd01 | 原神服务器类型:世界树(渠道服) |
 
-### genshin 包
+## genshin 包
 
 > 定义了原神相关api
 
@@ -80,11 +80,17 @@ func main() {
 | GenShinCore | GameRecordIndex    | 获取宝箱,探索度,声望等数据            |
 | GenShinCore | GetSpiralAbyssInfo | 获取深渊数据                    |
 
-如何使用?
 
 #### 初始化
 
 ```go
+//先登录
+app := mhyapp.AppCore{}
+if err := app.LoginToCookies(userCookiesStr); err != nil {
+    panic(err)
+}
+appCookiesStr := app.Cookies.GetStr()
+
 //appCookiesStr为使用mhyapp包登陆之后的cookies
 gameCore, err := genshin.NewCore(appCookiesStr)
 if err != nil {
@@ -92,11 +98,11 @@ if err != nil {
 }
 ```
 
-### mhyapp 包
+## mhyapp 包
 
 > 定义了米游币等相关api
 
-#### 方法列表
+### 方法列表
 
 
 | 父结构     | 方法名                      | 注释                                                          |
@@ -112,12 +118,23 @@ if err != nil {
 | AppCore | PostShare                | 帖子分享                                                        |
 | AppCore | BBSSign                  | 指定板块签到                                                      |
 
-### request 包
+> cookies登陆 https://user.mihoyo.com/ 获取
+
+```go
+app := mhyapp.AppCore{}
+if err := app.LoginToCookies(userCookiesStr); err != nil {
+	panic(err)
+}
+//自行保存cookies
+fmt.Println(app.Cookies.GetStr())
+```
+
+## request 包
 
 > 定义了内部请求封装函数
 
-### tools 包
+## tools 包
 
 > 内部杂项函数
 
-### 未完成
+## 更新中
