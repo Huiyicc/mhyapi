@@ -25,3 +25,13 @@ func GetDs2(q, b string) string {
 	c := GetMd5(fmt.Sprintf("salt=%s&t=%d&r=%d&b=%s&q=%s", n, t, r, b, q))
 	return fmt.Sprintf("%d,%d,%s", t, r, c)
 }
+
+// GetDs3 用于获取DS值，请求需要
+func GetDs3(q, b string) string {
+	n := define.BBS_STALT_C
+	t := time.Now().Unix()
+	rand.Seed(time.Now().UnixNano())
+	r := rand.Intn(99999) + 100000
+	c := GetMd5(fmt.Sprintf("salt=%s&t=%d&r=%d&b=%s&q=%s", n, t, r, b, q))
+	return fmt.Sprintf("%d,%d,%s", t, r, c)
+}

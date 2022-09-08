@@ -8,16 +8,16 @@ import (
 )
 
 func HttpGet(uri RequestStruct, header http.Header) ([]byte, error) {
-	url := uri.Url
+	urls := uri.Url
 	if uri.Query != "" {
-		url += "?" + uri.Query
+		urls += "?" + uri.Query
 	}
 	var (
 		req  *http.Request
 		resp *http.Response
 		err  error
 	)
-	if req, err = http.NewRequest("GET", url, nil); err != nil {
+	if req, err = http.NewRequest("GET", urls, nil); err != nil {
 		return nil, err
 	}
 	if header != nil {
@@ -35,9 +35,9 @@ func HttpGet(uri RequestStruct, header http.Header) ([]byte, error) {
 }
 
 func HttpPost(uri RequestStruct, header http.Header) ([]byte, error) {
-	url := uri.Url
+	urls := uri.Url
 	if uri.Query != "" {
-		url += "?" + uri.Query
+		urls += "?" + uri.Query
 	}
 	var (
 		req  *http.Request
@@ -45,7 +45,7 @@ func HttpPost(uri RequestStruct, header http.Header) ([]byte, error) {
 		err  error
 	)
 
-	if req, err = http.NewRequest("POST", url, strings.NewReader(uri.Body.Get())); err != nil {
+	if req, err = http.NewRequest("POST", urls, strings.NewReader(uri.Body.Get())); err != nil {
 		return nil, err
 	}
 	if header != nil {

@@ -59,8 +59,9 @@ func (t *GenShinCore) updateHeader() {
 
 func (t *GenShinCore) getGameHeaders(q, b string) http.Header {
 	headers := t.getHeaders().Clone()
-	headers["Accept"] = []string{"*/*"}
 	headers["DS"] = []string{tools.GetDs2(q, b)}
+	headers["Accept"] = []string{"application/json, text/plain, */*"}
+	headers["Cookie"] = []string{t.Cookies.GetStr()}
 	headers["x-rpc-client_type"] = []string{define.APPCLIENT_TYPE_ANDROID}
 	headers["x-rpc-app_version"] = []string{define.APPCLIENT_VERSIONS}
 	headers["x-rpc-sys_version"] = []string{"6.0.1"}
@@ -70,7 +71,6 @@ func (t *GenShinCore) getGameHeaders(q, b string) http.Header {
 	headers["x-rpc-device_model"] = []string{"Mi 10"}
 	headers["Referer"] = []string{"https://app.mihoyo.com"}
 	headers["User-Agent"] = []string{"okhttp/4.8.0"}
-	headers["cookie"] = []string{t.Cookies.GetStr()}
-	headers["Content-Type"] = []string{"application/json"}
+
 	return headers
 }
