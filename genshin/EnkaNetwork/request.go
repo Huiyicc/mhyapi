@@ -7,8 +7,8 @@ import (
 )
 
 // GetUserDataRaw 使用UID获取玩家数据,返回原始键值对
-func (t *EnkaCore) GetUserDataRaw(uid string, ttl ...bool) (CharactersCore, error) {
-	url := t.nodeUrl + "u/" + uid + "/__data.json"
+func (t *EnkaCore) GetUserDataRaw(uid string, ttl ...bool) (*CharactersCore, error) {
+	url := nodeUrl + "u/" + uid + "/__data.json"
 	cachePath := t.cachePath + "uid_data"
 	os.MkdirAll(cachePath, 0655)
 	data, err := t.cacheHttpGet(url, cachePath)
@@ -21,35 +21,29 @@ func (t *EnkaCore) GetUserDataRaw(uid string, ttl ...bool) (CharactersCore, erro
 		return nil, err
 	}
 	//获取ttl
-	lstTime := f["ltime"]
-	if lstTime == nil {
-		//ttl不存在,是新的,设置ttl
+	lstTime := f.Ltime
+	if lstTime == 0 {
+		//ttl=0,是新的,设置ttl
 		lstTime = time.Now().Unix()
-		f["ltime"] = lstTime
+		f.Ltime = lstTime
 		data, err = json.Marshal(f)
 		//更新缓存
 		if err = t.setCacheData(t.getUrlCachePath(url, cachePath), data); err != nil {
 			return nil, err
 		}
 	}
-	ltime, _ := lstTime.(float64)
-	if ltime == 0 {
-		lint64, _ := lstTime.(int64)
-		ltime = float64(lint64)
-	}
-	var ttlb float64
-	ttlb, _ = f["ttl"].(float64)
+	ttlb := int64(f.Ttl)
 	if len(ttl) > 0 {
 		if !ttl[0] {
-			ttlb = ltime
+			ttlb = lstTime
 		}
 	}
-	if float64(time.Now().Unix()) > ltime+ttlb {
+	if time.Now().Unix() > lstTime+ttlb {
 		//当ttl过期的时候刷新,删除缓存,重新请求
 		if err = os.Remove(t.getUrlCachePath(url, cachePath)); err != nil {
 			return nil, err
 		}
 		return t.GetUserDataRaw(uid)
 	}
-	return f, nil
+	return &f, nil
 }

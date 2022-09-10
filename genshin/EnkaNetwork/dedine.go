@@ -3,6 +3,7 @@ package EnkaNetwork
 import (
 	_ "embed"
 	"errors"
+	"fmt"
 	json "github.com/json-iterator/go"
 	"os"
 )
@@ -15,36 +16,52 @@ const (
 
 var (
 	ErrorCacheIsNoteSet = errors.New("缓存不存在")
-
+	nodeUrl             = NODE_URL_ENKA
 	//go:embed characters.json
 	characters []byte
 
 	//go:embed dictionaries.json
 	dictionariesRaw []byte
+	//go:embed loc.json
+	locTextHashRaw []byte
 
-	dictionariesMap dictionaries
+	dictionariesMap dictionariesMapCore
 	charactersMap   charactersMapCore
+	locTextMap      locTextMapCore
 )
 
 func init() {
+	fmt.Println("EnkaNetworkLoading...")
+	fmt.Println("填充charactersMap")
 	if charactersMap == nil || len(charactersMap) == 0 {
 		err := json.Unmarshal(characters, &charactersMap)
 		if err != nil {
 			panic(err)
 		}
 	}
+	fmt.Println("填充dictionariesMap")
 	if !dictionariesMap.init {
 		err := json.Unmarshal(dictionariesRaw, &dictionariesMap)
 		if err != nil {
 			panic(err)
 		}
 	}
+	fmt.Println("填充locTextMap")
+	err := json.Unmarshal(locTextHashRaw, &locTextMap)
+	if err != nil {
+		panic(err)
+	}
+}
+
+// SetNodeUrl 用于设置节点地址
+func SetNodeUrl(url string) {
+	nodeUrl = url
 }
 
 // NewEnkaCore 创建一个新的实例包
 // cache为必填参数,因为EnkaNetwork有ttl,而且在境外
 // 所以做cache是最好的
-func NewEnkaCore(cachePath, nodeUrl string) (*EnkaCore, error) {
+func NewEnkaCore(cachePath string) (*EnkaCore, error) {
 	err := os.MkdirAll(cachePath, 655)
 	if err != nil {
 		return nil, err
@@ -59,13 +76,10 @@ func NewEnkaCore(cachePath, nodeUrl string) (*EnkaCore, error) {
 	}
 	return &EnkaCore{
 		cachePath: cachePath,
-		nodeUrl:   nodeUrl,
 	}, nil
 }
 
 type EnkaCore struct {
 	//缓存目录
 	cachePath string
-	//节点网址
-	nodeUrl string
 }
