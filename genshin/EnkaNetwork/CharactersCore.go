@@ -4,18 +4,17 @@ import (
 	"errors"
 )
 
-type CharactersCore CharactersInfo
-
-type CharactersInfo struct {
-	Ltime          int64                  `json:"ltime"`
-	Ttl            int                    `json:"ttl"`
-	Uid            string                 `json:"uid"`
-	PlayerInfo     CharactersPlayerInfo   `json:"playerInfo"`
-	AvatarInfoList []CharactersAvatarInfo `json:"avatarInfoList"`
+// UserData 为某uid下的用户信息结构体
+type UserData struct {
+	Ltime          int64        `json:"ltime"`          //最后更新时间
+	Ttl            int          `json:"ttl"`            //缓存时间(秒)
+	Uid            string       `json:"uid"`            //玩家游戏UID
+	PlayerInfo     PlayerInfo   `json:"playerInfo"`     //玩家资料信息
+	AvatarInfoList []AvatarInfo `json:"avatarInfoList"` //正在展示的每个角色的详细信息列表
 }
 
-// CharactersPlayerInfo 为获取到的玩家信息结构体
-type CharactersPlayerInfo struct {
+// PlayerInfo 玩家资料信息
+type PlayerInfo struct {
 	Signature            string           `json:"signature"`            //签名
 	WorldLevel           int              `json:"worldLevel"`           //世界等级
 	NameCardId           int              `json:"nameCardId"`           //资料名片 ID
@@ -31,7 +30,8 @@ type CharactersPlayerInfo struct {
 	} `json:"profilePicture"` //玩家头像的角色 ID
 }
 
-type CharactersAvatarInfo struct {
+// AvatarInfo 角色的详细信息列表
+type AvatarInfo struct {
 	FetterInfo struct {
 		ExpLevel int `json:"expLevel"` //等级
 	} `json:"fetterInfo"` //角色好感等级
@@ -81,7 +81,7 @@ type CharactersAvatarInfo struct {
 	TalentIdList []int `json:"talentIdList,omitempty"` //命之座 ID 列表,如果未解锁任何命之座则此数据不存在
 }
 
-// ShowAvatarInfo 为对外展示的基础角色信息
+// ShowAvatarInfo 对外展示的基础角色信息
 type ShowAvatarInfo struct {
 	AvatarId  int64 `json:"avatarId"`  //角色 ID
 	Level     int   `json:"level"`     //角色等级
@@ -89,7 +89,7 @@ type ShowAvatarInfo struct {
 }
 
 // GetPlayerAvatarInfoForID 指定ID取玩家展柜角色数据
-func (t CharactersCore) GetPlayerAvatarInfoForID(AvatarID int64) (ShowAvatarInfo, error) {
+func (t UserData) GetPlayerAvatarInfoForID(AvatarID int64) (ShowAvatarInfo, error) {
 	for i := 0; i < len(t.PlayerInfo.ShowAvatarInfoList); i++ {
 		if t.PlayerInfo.ShowAvatarInfoList[i].AvatarId == AvatarID {
 			return t.PlayerInfo.ShowAvatarInfoList[i], nil
@@ -99,7 +99,7 @@ func (t CharactersCore) GetPlayerAvatarInfoForID(AvatarID int64) (ShowAvatarInfo
 }
 
 // GetPlayerAvatarInfoForIndex 指定索引取玩家展柜角色数据 [index:0-7]
-func (t CharactersCore) GetPlayerAvatarInfoForIndex(index int) (ShowAvatarInfo, error) {
+func (t UserData) GetPlayerAvatarInfoForIndex(index int) (ShowAvatarInfo, error) {
 	if index < 0 || index > 7 || index >= len(t.PlayerInfo.ShowAvatarInfoList) {
 		return ShowAvatarInfo{}, errors.New("索引超出范围")
 	}
@@ -107,19 +107,9 @@ func (t CharactersCore) GetPlayerAvatarInfoForIndex(index int) (ShowAvatarInfo, 
 }
 
 // GetAvatarInfoList 取展示角色的信息列表
-func (t CharactersCore) GetAvatarInfoList() ([]ShowAvatarInfo, error) {
+func (t UserData) GetAvatarInfoList() ([]ShowAvatarInfo, error) {
 	if len(t.PlayerInfo.ShowAvatarInfoList) == 0 {
 		return nil, errors.New("展柜无数据或未开放展柜")
 	}
 	return t.PlayerInfo.ShowAvatarInfoList, nil
 }
-
-/*// GetAvatarInfoRow 取展示角色的元素
-func (t CharactersCore) GetAvatarInfoRow(roleID int) (CharactersMapInfoRaw, error) {
-	return charactersMap.GetInfoByID(strconv.Itoa(roleID))
-}*/
-
-/*// GetAvatarInfoTranslate 取展示角色的元素,自动翻译
-func (t CharactersCore) GetAvatarInfoTranslate(roleID int) (CharactersMapInfoRaw, error) {
-	return charactersMap.GetInfoByID(strconv.Itoa(roleID))
-}*/

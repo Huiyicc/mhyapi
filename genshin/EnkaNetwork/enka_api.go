@@ -8,9 +8,8 @@ import (
 	"os"
 )
 
-func (t *EnkaCore) cacheHttpGet(url, cachePath string) ([]byte, error) {
-	cp := t.getUrlCachePath(url, cachePath)
-	if data, err := t.getCacheData(cp); err == nil && err != ErrorCacheIsNoteSet {
+func (t *EnkaCore) httpGetIncidentalCache(url, cacheFilename string) ([]byte, error) {
+	if data, err := t.getCacheData(cacheFilename); err == nil && err != ErrorCacheIsNoteSet {
 		return data, nil
 	}
 	req, err := http.NewRequest("GET", url, nil)
@@ -30,12 +29,12 @@ func (t *EnkaCore) cacheHttpGet(url, cachePath string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	f, err := os.OpenFile(cp, os.O_RDWR|os.O_CREATE, 0655)
+	f, err := os.OpenFile(cacheFilename, os.O_RDWR|os.O_CREATE, 0655)
 	if err != nil {
 		return nil, err
 	}
 	defer f.Close()
-	t.setCacheData(cp, data)
+	t.setCacheData(cacheFilename, data)
 	return data, err
 }
 func (t *EnkaCore) getCacheData(cachePath string) ([]byte, error) {

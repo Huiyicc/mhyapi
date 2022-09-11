@@ -15,7 +15,7 @@ func test_Enka() {
 		panic(err)
 	}
 	//获取原始数据
-	var rawCore *EnkaNetwork.CharactersCore
+	var rawCore *EnkaNetwork.UserData
 	if rawCore, err = enka.GetUserDataRaw("112075042", false); err != nil {
 		panic(err)
 	}
@@ -25,11 +25,15 @@ func test_Enka() {
 		panic(err)
 	}
 	//获取角色id对应信息
-	var linfor *EnkaNetwork.CharactersMapInfoLoc
-	if linfor, err = EnkaNetwork.GetCharactersAvatarInfoLocByID(EnkaNetwork.HASHTEXT_LANGUAGE_ZHCN, Avatar0.AvatarId); err != nil {
+	var linfor *EnkaNetwork.CharactersInfoLoc
+	if linfor, err = EnkaNetwork.GetCharactersInfoLocByID(EnkaNetwork.HASHTEXT_LANGUAGE_ZHCN, Avatar0.AvatarId); err != nil {
 		panic(err)
 	}
 	fmt.Println(linfor)
+	_, err = EnkaNetwork.GetResourcesData(enka, linfor.SideImgName)
+	if err != nil {
+		panic(err)
+	}
 	/*//获取展柜id列表
 	var AvatarIDList []int
 	if AvatarIDList, err = rawCore.GetAvatarIDList(); err != nil {

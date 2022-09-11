@@ -3,7 +3,6 @@ package EnkaNetwork
 import (
 	_ "embed"
 	"errors"
-	"fmt"
 	json "github.com/json-iterator/go"
 	"os"
 )
@@ -31,22 +30,22 @@ var (
 )
 
 func init() {
-	fmt.Println("EnkaNetworkLoading...")
-	fmt.Println("填充charactersMap")
+	//fmt.Println("EnkaNetworkLoading...")
+	//fmt.Println("填充charactersMap")
 	if charactersMap == nil || len(charactersMap) == 0 {
 		err := json.Unmarshal(characters, &charactersMap)
 		if err != nil {
 			panic(err)
 		}
 	}
-	fmt.Println("填充dictionariesMap")
+	//fmt.Println("填充dictionariesMap")
 	if !dictionariesMap.init {
 		err := json.Unmarshal(dictionariesRaw, &dictionariesMap)
 		if err != nil {
 			panic(err)
 		}
 	}
-	fmt.Println("填充locTextMap")
+	//fmt.Println("填充locTextMap")
 	err := json.Unmarshal(locTextHashRaw, &locTextMap)
 	if err != nil {
 		panic(err)

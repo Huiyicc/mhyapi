@@ -7,16 +7,16 @@ import (
 )
 
 // GetUserDataRaw 使用UID获取玩家数据,返回原始键值对
-func (t *EnkaCore) GetUserDataRaw(uid string, ttl ...bool) (*CharactersCore, error) {
+func (t *EnkaCore) GetUserDataRaw(uid string, ttl ...bool) (*UserData, error) {
 	url := nodeUrl + "u/" + uid + "/__data.json"
 	cachePath := t.cachePath + "uid_data"
 	os.MkdirAll(cachePath, 0655)
-	data, err := t.cacheHttpGet(url, cachePath)
+	data, err := t.httpGetIncidentalCache(url, t.getUrlCachePath(url, cachePath))
 	if err != nil {
 		return nil, err
 	}
 	//解析数据
-	var f CharactersCore
+	var f UserData
 	if err = json.Unmarshal(data, &f); err != nil {
 		return nil, err
 	}
