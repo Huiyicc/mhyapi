@@ -35,7 +35,7 @@ type AvatarInfo struct {
 	FetterInfo struct {
 		ExpLevel int `json:"expLevel"` //等级
 	} `json:"fetterInfo"` //角色好感等级
-	AvatarId int `json:"avatarId"` //角色ID
+	AvatarId int64 `json:"avatarId"` //角色ID
 	PropMap  map[string]struct {
 		Type int    `json:"type"` //属性类型,可使用 dictionariesMap.Prop[type] 获取
 		Ival string `json:"ival"` //忽略它
@@ -51,7 +51,7 @@ type AvatarInfo struct {
 			AppendPropIdList []int `json:"appendPropIdList"` //圣遗物副属性 ID 列表
 			Level            int   `json:"level"`            //圣遗物等级 [1-21]
 			MainPropId       int   `json:"mainPropId"`       //圣遗物主属性 ID
-		} `json:"reliquary,omitempty"` //圣遗物基本信息
+		} `json:"reliquary"` //圣遗物基本信息
 		Flat struct {
 			ReliquaryMainstat struct {
 				MainPropId string  `json:"mainPropId"` //属性名称
@@ -60,7 +60,7 @@ type AvatarInfo struct {
 			ReliquarySubstats []struct {
 				AppendPropId string  `json:"appendPropId"` //属性名称
 				StatValue    float64 `json:"statValue"`    //属性值
-			} `json:"reliquarySubstats,omitempty"` //圣遗物副属性列表
+			} `json:"reliquarySubstats"` //圣遗物副属性列表
 			ItemType           string `json:"itemType"`                     //装备类别：武器、圣遗物
 			Icon               string `json:"icon"`                         //装备图标名称
 			EquipType          string `json:"equipType,omitempty"`          //圣遗物类型
@@ -78,7 +78,7 @@ type AvatarInfo struct {
 			AffixMap     map[string]int `json:"affixMap"`     //武器精炼信息
 		} `json:"weapon,omitempty"` //武器基本信息
 	} `json:"equipList"` //装备列表：武器、圣遗物
-	TalentIdList []int `json:"talentIdList,omitempty"` //命之座 ID 列表,如果未解锁任何命之座则此数据不存在
+	TalentIdList []int `json:"talentIdList"` //命之座 ID 列表,如果未解锁任何命之座则此数据不存在
 }
 
 // ShowAvatarInfo 对外展示的基础角色信息

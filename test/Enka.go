@@ -30,6 +30,7 @@ func test_Enka() {
 		panic(err)
 	}
 	fmt.Println(linfor)
+	//获取角色立绘
 	_, err = EnkaNetwork.GetResourcesData(enka, linfor.SideImgName)
 	if err != nil {
 		panic(err)
