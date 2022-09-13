@@ -45,40 +45,49 @@ type AvatarInfo struct {
 	SkillDepotId           int                `json:"skillDepotId"`           //角色天赋 ID
 	InherentProudSkillList []int              `json:"inherentProudSkillList"` //固定天赋列表 ID
 	SkillLevelMap          map[string]int     `json:"skillLevelMap"`          //天赋等级 Map
-	EquipList              []struct {
-		ItemId    int `json:"itemId"` // 装备/圣遗物 ID
-		Reliquary struct {
-			AppendPropIdList []int `json:"appendPropIdList"` //圣遗物副属性 ID 列表
-			Level            int   `json:"level"`            //圣遗物等级 [1-21]
-			MainPropId       int   `json:"mainPropId"`       //圣遗物主属性 ID
-		} `json:"reliquary"` //圣遗物基本信息
-		Flat struct {
-			ReliquaryMainstat struct {
-				MainPropId string  `json:"mainPropId"` //属性名称
-				StatValue  float64 `json:"statValue"`  //属性值
-			} `json:"reliquaryMainstat,omitempty"` //圣遗物主属性
-			ReliquarySubstats []struct {
-				AppendPropId string  `json:"appendPropId"` //属性名称
-				StatValue    float64 `json:"statValue"`    //属性值
-			} `json:"reliquarySubstats"` //圣遗物副属性列表
-			ItemType           string `json:"itemType"`                     //装备类别：武器、圣遗物
-			Icon               string `json:"icon"`                         //装备图标名称
-			EquipType          string `json:"equipType,omitempty"`          //圣遗物类型
-			NameTextMapHash    string `json:"nameTextMapHash"`              //装备名的哈希值
-			SetNameTextMapHash string `json:"setNameTextMapHash,omitempty"` //圣遗物套装的名称的哈希值
-			RankLevel          int    `json:"rankLevel"`                    //装备稀有度
-			WeaponStats        []struct {
-				StatValue    float64 `json:"statValue"`    //属性名称
-				AppendPropId string  `json:"appendPropId"` //属性值
-			} `json:"weaponStats,omitempty"` //武器属性列表：基础攻击力、副属性
-		} `json:"flat"` //装备详细信息
-		Weapon struct {
-			Level        int            `json:"level"`        //武器等级
-			PromoteLevel int            `json:"promoteLevel"` //武器突破星级
-			AffixMap     map[string]int `json:"affixMap"`     //武器精炼信息
-		} `json:"weapon,omitempty"` //武器基本信息
-	} `json:"equipList"` //装备列表：武器、圣遗物
-	TalentIdList []int `json:"talentIdList"` //命之座 ID 列表,如果未解锁任何命之座则此数据不存在
+	EquipList              []EquipInfo        `json:"equipList"`              //装备列表：武器、圣遗物
+	TalentIdList           []int              `json:"talentIdList"`           //命之座 ID 列表,如果未解锁任何命之座则此数据不存在
+}
+
+// EquipInfo 角色装备与圣遗物信息
+type EquipInfo struct {
+	ItemId    int `json:"itemId"` // 装备/圣遗物 ID
+	Reliquary struct {
+		AppendPropIdList []int `json:"appendPropIdList"` //圣遗物副属性 ID 列表
+		Level            int   `json:"level"`            //圣遗物等级 [1-21]
+		MainPropId       int   `json:"mainPropId"`       //圣遗物主属性 ID
+	} `json:"reliquary,omitempty"` //圣遗物基本信息
+	Flat struct {
+		ReliquaryMainstat struct {
+			MainPropId string  `json:"mainPropId"` //属性名称
+			StatValue  float64 `json:"statValue"`  //属性值
+		} `json:"reliquaryMainstat,omitempty"` //圣遗物主属性
+		ReliquarySubstats []struct {
+			AppendPropId string  `json:"appendPropId"` //属性名称
+			StatValue    float64 `json:"statValue"`    //属性值
+		} `json:"reliquarySubstats"` //圣遗物副属性列表
+		ItemType           string             `json:"itemType"`                     //装备类别：武器、圣遗物
+		Icon               string             `json:"icon"`                         //装备图标名称
+		EquipType          string             `json:"equipType,omitempty"`          //圣遗物类型
+		NameTextMapHash    string             `json:"nameTextMapHash"`              //装备名的哈希值
+		SetNameTextMapHash string             `json:"setNameTextMapHash,omitempty"` //圣遗物套装的名称的哈希值
+		RankLevel          int                `json:"rankLevel"`                    //装备稀有度
+		WeaponStats        []EquipWeaponStats `json:"weaponStats,omitempty"`        //武器属性列表：基础攻击力、副属性
+	} `json:"flat"` //装备详细信息
+	Weapon EquipWeaponInfo `json:"weapon,omitempty"` //武器基本信息
+}
+
+// EquipWeaponInfo 武器信息
+type EquipWeaponInfo struct {
+	Level        int            `json:"level"`        //武器等级
+	PromoteLevel int            `json:"promoteLevel"` //武器突破星级
+	AffixMap     map[string]int `json:"affixMap"`     //武器精炼信息
+}
+
+// EquipWeaponStats 武器附加属性
+type EquipWeaponStats struct {
+	StatValue    float64 `json:"statValue"`    //属性名称
+	AppendPropId string  `json:"appendPropId"` //属性值
 }
 
 // ShowAvatarInfo 对外展示的基础角色信息
