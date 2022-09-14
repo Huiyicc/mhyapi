@@ -58,14 +58,8 @@ type EquipInfo struct {
 		MainPropId       int   `json:"mainPropId"`       //圣遗物主属性 ID
 	} `json:"reliquary,omitempty"` //圣遗物基本信息
 	Flat struct {
-		ReliquaryMainstat struct {
-			MainPropId string  `json:"mainPropId"` //属性名称
-			StatValue  float64 `json:"statValue"`  //属性值
-		} `json:"reliquaryMainstat,omitempty"` //圣遗物主属性
-		ReliquarySubstats []struct {
-			AppendPropId string  `json:"appendPropId"` //属性名称
-			StatValue    float64 `json:"statValue"`    //属性值
-		} `json:"reliquarySubstats"` //圣遗物副属性列表
+		ReliquaryMainstat  ReliquaryStat      `json:"reliquaryMainstat,omitempty"`  //圣遗物主属性
+		ReliquarySubstats  []ReliquaryStat    `json:"reliquarySubstats"`            //圣遗物副属性列表
 		ItemType           string             `json:"itemType"`                     //装备类别：武器、圣遗物
 		Icon               string             `json:"icon"`                         //装备图标名称
 		EquipType          string             `json:"equipType,omitempty"`          //圣遗物类型
@@ -75,6 +69,13 @@ type EquipInfo struct {
 		WeaponStats        []EquipWeaponStats `json:"weaponStats,omitempty"`        //武器属性列表：基础攻击力、副属性
 	} `json:"flat"` //装备详细信息
 	Weapon EquipWeaponInfo `json:"weapon,omitempty"` //武器基本信息
+}
+
+// ReliquaryStat 为圣遗物词条对
+type ReliquaryStat struct {
+	MainPropId   string  `json:"mainPropId"`   //主属性名称
+	AppendPropID string  `json:"appendPropID"` //副词条名称
+	StatValue    float64 `json:"statValue"`    //属性值
 }
 
 // EquipWeaponInfo 武器信息
