@@ -137,6 +137,7 @@ func (t *AppCore) BBSSign(forumID string) (int, error) {
 	header := t.getHeaders().Clone()
 	header["DS"] = []string{tools.GetDs2("", req.Body.Get())}
 	data, err := request.HttpPost(req, header)
+	fmt.Println(string(data))
 	if err != nil {
 		return 0, err
 	}
